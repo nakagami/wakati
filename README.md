@@ -51,7 +51,8 @@ To create optimized release binaries, simply run `make release` instead.
 
 ### Requirements
 
-You will need the Mecab dictionary.
+You need the Mecab dictionary installation.
+
 See https://github.com/nakagami/awabi?tab=readme-ov-file#requirements-and-how-to-install .
 
 If mecabrc is not in the usual location, specify it via an environment variable.
@@ -68,7 +69,7 @@ To run the extension code, start `duckdb` with `-unsigned` flag. This will allow
 duckdb -unsigned
 ```
 
-After loading the extension by the file path, you can use the functions provided by the extension (in this case, `rusty_quack()`).
+After loading the extension by the file path, you can use the functions provided by the extension (in this case, `wakati()`).
 
 ```sql
 LOAD './build/debug/extension/wakati/wakati.duckdb_extension';
