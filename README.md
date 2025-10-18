@@ -14,7 +14,7 @@ Features:
 Clone the repo with submodules
 
 ```shell
-git clone --recurse-submodules <repo>
+git clone --recurse-submodules git@github.com:nakagami/wakati.git
 ```
 
 ## Dependencies
