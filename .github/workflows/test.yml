@@ -22,5 +22,6 @@ jobs:
       run: |
         git submodule update --init --recursive
         make configure
+        make debug
     - name: Run tests
       run: make test_debug
