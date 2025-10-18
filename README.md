@@ -1,6 +1,6 @@
-# Wakati scala function for DuckDB
+# DuckDB extension `wakati` scala function
 
-This is a Scalar Function that splits Japanese morphemes and connects them with spaces.
+This is a DuckDB extension that splits Japanese morphemes and connects them with spaces.
 It returns the same result as when executing mecab command like bellow.
 
 ```mecab -O wakati
@@ -47,6 +47,18 @@ a script is run to transform the shared library into a loadable extension by app
 to the `build/debug` directory.
 
 To create optimized release binaries, simply run `make release` instead.
+
+### Requirements
+
+You will need the Mecab dictionary.
+See https://github.com/nakagami/awabi?tab=readme-ov-file#requirements-and-how-to-install .
+
+If mecabrc is not in the usual location, specify it via an environment variable.
+For example, if you installed the Mecab dictionary using brew, you'll likely need to set environment variable as bellow.
+
+```
+export MECABRC=/opt/homebrew/etc/mecabrc
+```
 
 ### Running the extension
 To run the extension code, start `duckdb` with `-unsigned` flag. This will allow you to load the local extension file.
