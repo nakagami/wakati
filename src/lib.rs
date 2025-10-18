@@ -48,8 +48,13 @@ impl VScalar for WakatiScalar {
         let output = output.flat_vector();
 
         for (i, s) in strings.enumerate() {
-            state.tokenizer.tokenize(&s);
-            output.insert(i, s.as_str());
+            let tokens = state.tokenizer.tokenize(&s);
+            let s2 = tokens
+                .iter()
+                .map(|t| t.0.as_str())
+                .collect::<Vec<&str>>()
+                .join(" ");
+            output.insert(i, s2.as_str());
         }
         Ok(())
     }
