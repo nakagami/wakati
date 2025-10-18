@@ -252,9 +252,9 @@ checksum = "c08606f8c3cbf4ce6ec8e28fb0014a2c086708fe954eaa885384a6165172e7e8"
 
 [[package]]
 name = "awabi"
-version = "0.3.0"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cda250127ebc42cd4e823f1a385fdd04860bf9427345e17eb9d635ae4291ec47"
+checksum = "d812b357b694d031cba253a41a40f0661ee0d451aeda58a091d1ff62818438c9"
 dependencies = [
  "clap",
  "memmap",

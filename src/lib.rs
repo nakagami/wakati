@@ -17,6 +17,7 @@ use std::error::Error;
 use awabi::tokenizer;
 use std::env;
 
+#[derive(Clone)]
 struct WakatiState {
     tokenizer: tokenizer::Tokenizer,
 }
