@@ -15,6 +15,7 @@ use libduckdb_sys::duckdb_string_t;
 use std::error::Error;
 
 use awabi::tokenizer;
+use std::env;
 
 struct WakatiState {
     tokenizer: tokenizer::Tokenizer,
@@ -64,8 +65,16 @@ const EXTENSION_NAME: &str = env!("CARGO_PKG_NAME");
 
 #[duckdb_entrypoint_c_api()]
 pub unsafe fn extension_entrypoint(con: Connection) -> Result<(), Box<dyn Error>> {
-    //    let tokenizer = tokenizer::Tokenizer::new(None).expect("Can't find dictionary");
-    con.register_scalar_function::<WakatiScalar>(EXTENSION_NAME)
-        .expect("Failed to register wakati function");
+    let tokenizer = if let Ok(mecabrc) = env::var("MECABRC") {
+        tokenizer::Tokenizer::new(Some(&mecabrc))
+    } else {
+        tokenizer::Tokenizer::new(None)
+    }
+    .expect("Can't find dictionary");
+    con.register_scalar_function_with_state::<WakatiScalar>(
+        EXTENSION_NAME,
+        &WakatiState { tokenizer },
+    )
+    .expect("Failed to register wakati function");
     Ok(())
 }
