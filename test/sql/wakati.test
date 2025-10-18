@@ -1,0 +1,21 @@
+# name: test/sql/wakati.test
+# description: test wakati extension
+# group: [wakati]
+
+# Before we load the extension, this will fail
+statement error
+SELECT wakati('col0') FROM values ('すもももももももものうち') as v;
+----
+Catalog Error: Scalar Function with name wakati does not exist!
+
+# Require statement will ensure the extension is loaded from now on
+require wakati
+
+require icu
+
+# Confirm the extension works
+query I
+SELECT wakati(col0) FROM values ('すもももももももものうち'), ('私の名前は中野です') as v;
+----
+すもも も もも も もも の うち
+私 の 名前 は 中野 です
