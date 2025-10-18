@@ -3,21 +3,16 @@ extern crate duckdb_loadable_macros;
 extern crate libduckdb_sys;
 
 use duckdb::{
-    core::{DataChunkHandle, Inserter, LogicalTypeHandle, LogicalTypeId},
+    core::{DataChunkHandle, Inserter, LogicalTypeId},
     types::DuckString,
     vscalar::{ScalarFunctionSignature, VScalar},
     vtab::arrow::WritableVector,
-    vtab::{BindInfo, InitInfo, TableFunctionInfo, VTab},
     Connection, Result,
 };
 use duckdb_loadable_macros::duckdb_entrypoint_c_api;
 use libduckdb_sys as ffi;
 use libduckdb_sys::duckdb_string_t;
-use std::{
-    error::Error,
-    ffi::CString,
-    sync::atomic::{AtomicBool, Ordering},
-};
+use std::error::Error;
 
 use awabi::tokenizer;
 
@@ -51,6 +46,7 @@ impl VScalar for WakatiScalar {
         let output = output.flat_vector();
 
         for (i, s) in strings.enumerate() {
+            state.tokenizer.tokenize(&s);
             output.insert(i, s.as_str());
         }
         Ok(())
