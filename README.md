@@ -3,7 +3,8 @@
 This is a DuckDB extension that splits Japanese morphemes and connects them with spaces.
 It returns the same result as when executing mecab command like bellow.
 
-```mecab -O wakati
+```
+mecab -O wakati
 ```
 
 Requires Rust for building.
