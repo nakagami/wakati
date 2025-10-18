@@ -56,7 +56,7 @@ You need the Mecab dictionary installation.
 See https://github.com/nakagami/awabi?tab=readme-ov-file#requirements-and-how-to-install .
 
 If mecabrc is not in the usual location, specify it via an environment variable.
-For example, if you installed the Mecab dictionary using brew, you'll likely need to set environment variable as bellow.
+For example, if you installed the Mecab dictionary using brew, you need to set environment variable as bellow.
 
 ```
 export MECABRC=/opt/homebrew/etc/mecabrc
@@ -88,8 +88,8 @@ SELECT wakati(col0) FROM values ('すもももももももものうち'), ('私�
 
 ## Testing
 This extension uses the DuckDB Python client for testing. This should be automatically installed in the `make configure` step.
-The tests themselves are written in the SQLLogicTest format, just like most of DuckDB's tests. A sample test can be found in
-`test/sql/<extension_name>.test`. To run the tests using the *debug* build:
+The tests themselves are written in the SQLLogicTest format, just like most of DuckDB's tests. A test can be found in
+`test/sql/wakati.test`. To run the tests using the *debug* build:
 
 ```shell
 make test_debug
