@@ -1,13 +1,12 @@
-# DuckDB Rust extension template
-This is an **experimental** template for Rust based extensions based on the C Extension API of DuckDB. The goal is to
-turn this eventually into a stable basis for pure-Rust DuckDB extensions that can be submitted to the Community extensions
-repository
+# Wakati scala function for DuckDB
 
-Features:
-- No DuckDB build required
-- No C++ or C code required
-- CI/CD chain preconfigured
-- (Coming soon) Works with community extensions
+This is a Scalar Function that splits Japanese morphemes and connects them with spaces.
+It returns the same result as when executing mecab command like bellow.
+
+```mecab -O wakati
+```
+
+Requires Rust for building.
 
 ## Cloning
 
@@ -59,17 +58,18 @@ duckdb -unsigned
 After loading the extension by the file path, you can use the functions provided by the extension (in this case, `rusty_quack()`).
 
 ```sql
-LOAD './build/debug/extension/rusty_quack/rusty_quack.duckdb_extension';
-SELECT * FROM rusty_quack('Jane');
+LOAD './build/debug/extension/wakati/wakati.duckdb_extension';
+SELECT wakati(col0) FROM values ('すもももももももものうち'), ('私の名前は中野です') AS v;
 ```
 
 ```
-┌─────────────────────┐
-│       column0       │
-│       varchar       │
-├─────────────────────┤
-│ Rusty Quack Jane 🐥 │
-└─────────────────────┘
+┌────────────────────────────────┐
+│          wakati(col0)          │
+│            varchar             │
+├────────────────────────────────┤
+│ すもも も もも も もも の うち │
+│ 私 の 名前 は 中野 です        │
+└────────────────────────────────┘
 ```
 
 ## Testing
@@ -97,7 +97,7 @@ to ensure the previous `make configure` step is deleted.
 
 Then, run
 ```
-DUCKDB_TEST_VERSION=v1.3.2 make configure
+DUCKDB_TEST_VERSION=v1.4.1 make configure
 ```
 to select a different duckdb version to test with
 
