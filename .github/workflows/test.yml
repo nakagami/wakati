@@ -24,4 +24,4 @@ jobs:
         make configure
         make debug
     - name: Run tests
-      run: make test_debug
+      run: make test_debug DUCKDB_PLATFORM=$(cat configure/platform.txt)
