@@ -34,20 +34,22 @@ Installing these dependencies will vary per platform:
 ## Building
 After installing the dependencies, building is a two-step process. Firstly run:
 ```shell
-make configure
+make configure DUCKDB_VERSION=1.4.5
 ```
 This will ensure a Python venv is set up with DuckDB and DuckDB's test runner installed. Additionally, depending on configuration,
 DuckDB will be used to determine the correct platform for which you are compiling.
 
 Then, to build the extension run:
 ```shell
-make debug
+make debug DUCKDB_VERSION=1.4.5
 ```
 This delegates the build process to cargo, which will produce a shared library in `target/debug/<shared_lib_name>`. After this step,
 a script is run to transform the shared library into a loadable extension by appending a binary footer. The resulting extension is written
 to the `build/debug` directory.
 
-To create optimized release binaries, simply run `make release` instead.
+Replace `1.4.5` with the DuckDB version you are targeting (e.g. `1.5.4`).
+
+To create optimized release binaries, simply run `make release DUCKDB_VERSION=1.4.5` instead.
 
 ### Requirements
 
