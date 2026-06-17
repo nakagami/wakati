@@ -11,6 +11,9 @@ USE_UNSTABLE_C_API=1
 # Target DuckDB version
 TARGET_DUCKDB_VERSION=v1.4.1
 
+# Use the same DuckDB version for testing as the target version
+DUCKDB_TEST_VERSION=1.4.1
+
 all: configure debug
 
 # Include makefiles from DuckDB
