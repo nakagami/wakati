@@ -9,10 +9,10 @@ EXTENSION_NAME=wakati
 USE_UNSTABLE_C_API=1
 
 # Target DuckDB version
-TARGET_DUCKDB_VERSION=v1.4.1
+TARGET_DUCKDB_VERSION=v1.4.4
 
 # Use the same DuckDB version for testing as the target version
-DUCKDB_TEST_VERSION=1.4.1
+DUCKDB_TEST_VERSION=1.4.4
 
 all: configure debug
 
