@@ -39,15 +39,17 @@ impl VScalar for WakatiScalar {
         input: &mut DataChunkHandle,
         output: &mut dyn WritableVector,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        let values = input.flat_vector(0);
-        let values = values.as_slice_with_len::<duckdb_string_t>(input.len());
-        let strings = values
-            .iter()
-            .map(|ptr| DuckString::new(&mut { *ptr }).as_str().to_string())
-            .take(input.len());
+        let input_vec = input.flat_vector(0);
+        let values = unsafe { input_vec.as_slice_with_len::<duckdb_string_t>(input.len()) };
         let output = output.flat_vector();
 
-        for (i, s) in strings.enumerate() {
+        for (i, value) in values.iter().enumerate() {
+            if input_vec.row_is_null(i as u64) {
+                output.set_null(i);
+                continue;
+            }
+            let mut value = *value;
+            let s = DuckString::new(&mut value).as_str().to_string();
             let tokens = state.tokenizer.tokenize(&s);
             let s2 = tokens
                 .iter()
@@ -69,7 +71,7 @@ impl VScalar for WakatiScalar {
 
 const EXTENSION_NAME: &str = env!("CARGO_PKG_NAME");
 
-#[duckdb_entrypoint_c_api()]
+#[duckdb_entrypoint_c_api]
 pub unsafe fn extension_entrypoint(con: Connection) -> Result<(), Box<dyn Error>> {
     let tokenizer = if let Ok(mecabrc) = env::var("MECABRC") {
         tokenizer::Tokenizer::new(Some(&mecabrc))
