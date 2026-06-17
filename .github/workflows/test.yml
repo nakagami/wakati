@@ -19,7 +19,7 @@ jobs:
         duckdb_version: ["1.4.5", "1.5.4"]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Install mecab-ipadic
       run: sudo apt install mecab-ipadic-utf8
     - name: Build
