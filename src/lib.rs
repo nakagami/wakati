@@ -40,8 +40,8 @@ impl VScalar for WakatiScalar {
         output: &mut dyn WritableVector,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let input_vec = input.flat_vector(0);
-        let values = unsafe { input_vec.as_slice_with_len::<duckdb_string_t>(input.len()) };
-        let output = output.flat_vector();
+        let values = input_vec.as_slice_with_len::<duckdb_string_t>(input.len());
+        let mut output = output.flat_vector();
 
         for (i, value) in values.iter().enumerate() {
             if input_vec.row_is_null(i as u64) {
