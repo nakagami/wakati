@@ -14,6 +14,10 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        duckdb_version: ["1.4.5", "1.5.4"]
+
     steps:
     - uses: actions/checkout@v2
     - name: Install mecab-ipadic
@@ -21,7 +25,7 @@ jobs:
     - name: Build
       run: |
         git submodule update --init --recursive
-        make configure
-        make debug
+        make configure DUCKDB_VERSION=${{ matrix.duckdb_version }}
+        make debug DUCKDB_VERSION=${{ matrix.duckdb_version }}
     - name: Run tests
-      run: make test
+      run: make test DUCKDB_VERSION=${{ matrix.duckdb_version }}

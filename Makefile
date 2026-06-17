@@ -1,4 +1,4 @@
-.PHONY: clean clean_all
+.PHONY: clean clean_all sync_cargo
 
 PROJ_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
@@ -8,11 +8,12 @@ EXTENSION_NAME=wakati
 # Note: currently extension-template-rs requires this, as duckdb-rs relies on unstable C API functionality
 USE_UNSTABLE_C_API=1
 
-# Target DuckDB version
-TARGET_DUCKDB_VERSION=v1.4.4
+# Single source of truth for DuckDB version (no "v" prefix)
+DUCKDB_VERSION=1.4.5
 
-# Use the same DuckDB version for testing as the target version
-DUCKDB_TEST_VERSION=1.4.4
+# Derived variables — do not edit these directly
+TARGET_DUCKDB_VERSION=v$(DUCKDB_VERSION)
+DUCKDB_TEST_VERSION=$(DUCKDB_VERSION)
 
 all: configure debug
 
@@ -20,7 +21,12 @@ all: configure debug
 include extension-ci-tools/makefiles/c_api_extensions/base.Makefile
 include extension-ci-tools/makefiles/c_api_extensions/rust.Makefile
 
-configure: venv platform extension_version
+# Sync DUCKDB_VERSION into Cargo.toml
+sync_cargo:
+	sed -i 's/^\(duckdb = { version = \)"[^"]*"/\1"$(DUCKDB_VERSION)"/' Cargo.toml
+	sed -i 's/^\(libduckdb-sys = { version = \)"[^"]*"/\1"$(DUCKDB_VERSION)"/' Cargo.toml
+
+configure: sync_cargo venv platform extension_version
 
 debug: build_extension_library_debug build_extension_with_metadata_debug
 release: build_extension_library_release build_extension_with_metadata_release

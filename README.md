@@ -101,25 +101,15 @@ make test_release
 ```
 
 ### Version switching
-Testing with different DuckDB versions is really simple:
+To build and test with a specific DuckDB version, pass `DUCKDB_VERSION` to make:
 
-First, run
-```
+```shell
 make clean_all
+make DUCKDB_VERSION=1.5.4
 ```
-to ensure the previous `make configure` step is deleted.
 
-Then, run
-```
-DUCKDB_TEST_VERSION=v1.4.1 make configure
-```
-to select a different duckdb version to test with
-
-Finally, build and test with
-```
-make debug
-make test_debug
-```
+This will automatically update `Cargo.toml` and set the correct DuckDB version for building and testing.
+The default version is defined in the `Makefile` (`DUCKDB_VERSION`).
 
 ### Known issues
 This is a bit of a footgun, but the extensions produced by this template may (or may not) be broken on windows on python3.11
