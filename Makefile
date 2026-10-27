@@ -4,12 +4,17 @@ PROJ_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 EXTENSION_NAME=wakati
 
-# Set to 1 to enable Unstable API (binaries will only work on TARGET_DUCKDB_VERSION, forwards compatibility will be broken)
-# Note: currently extension-template-rs requires this, as duckdb-rs relies on unstable C API functionality
+# Mark the extension as C_STRUCT_UNSTABLE: DuckDB 2.x requires the _init_c_api_v2 entrypoint.
+# Binaries load only in the exact TARGET_DUCKDB_VERSION, not in newer DuckDB releases.
 USE_UNSTABLE_C_API=1
+CAPI_VERSION=2
 
 # Single source of truth for DuckDB version (no "v" prefix)
-DUCKDB_VERSION=1.4.5
+DUCKDB_VERSION=2.0.0
+
+ifeq ($(DUCKDB_VERSION),2.0)
+	override DUCKDB_VERSION := 2.0.0
+endif
 
 # Derived variables — do not edit these directly
 TARGET_DUCKDB_VERSION=v$(DUCKDB_VERSION)
@@ -23,8 +28,6 @@ include extension-ci-tools/makefiles/c_api_extensions/rust.Makefile
 
 # Sync DUCKDB_VERSION into Cargo.toml
 sync_cargo:
-	sed -i 's/^\(duckdb = { version = \)"[^"]*"/\1"$(DUCKDB_VERSION)"/' Cargo.toml
-	sed -i 's/^\(libduckdb-sys = { version = \)"[^"]*"/\1"$(DUCKDB_VERSION)"/' Cargo.toml
 
 configure: sync_cargo venv platform extension_version
 

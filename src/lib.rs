@@ -1,88 +1,74 @@
-extern crate duckdb;
-extern crate duckdb_loadable_macros;
-extern crate libduckdb_sys;
-
-use duckdb::{
-    core::{DataChunkHandle, Inserter, LogicalTypeId},
-    types::DuckString,
-    vscalar::{ScalarFunctionSignature, VScalar},
-    vtab::arrow::WritableVector,
-    Connection, Result,
-};
-use duckdb_loadable_macros::duckdb_entrypoint_c_api;
-use libduckdb_sys as ffi;
-use libduckdb_sys::duckdb_string_t;
-use std::error::Error;
-
-use awabi::tokenizer;
 use std::env;
 
-#[derive(Clone)]
-struct WakatiState {
+use awabi::tokenizer;
+use duckdb_loadable_macros::duckdb_entrypoint_c_api_v2;
+use duckdb_neo::{
+    DuckDBType, Result,
+    extension::Extension,
+    scalar::{ScalarCallbacks, ScalarFunctionBuilder},
+    signature::{FunctionParameter, SignatureBuilder},
+};
+
+struct WakatiScalar {
     tokenizer: tokenizer::Tokenizer,
 }
-impl Default for WakatiState {
-    fn default() -> Self {
-        Self {
-            tokenizer: tokenizer::Tokenizer::new(None).unwrap(),
-        }
-    }
-}
 
-struct WakatiScalar {}
+impl ScalarCallbacks for WakatiScalar {
+    type BindData = ();
+    type InitData = ();
 
-impl VScalar for WakatiScalar {
-    type State = WakatiState;
+    fn exec(
+        &self,
+        _bind_data: Option<&Self::BindData>,
+        _init_data: Option<&mut Self::InitData>,
+        _context: &duckdb_neo::connection::Context,
+        vectors: &mut duckdb_neo::data_chunk::VectorCollection,
+        output: duckdb_neo::vector::Vector<'_, duckdb_neo::vector::Unknown>,
+    ) -> Result<()> {
+        let mut output = output.cast::<String>()?;
+        output.set_size(vectors.row_count()?)?;
 
-    unsafe fn invoke(
-        state: &Self::State,
-        input: &mut DataChunkHandle,
-        output: &mut dyn WritableVector,
-    ) -> Result<(), Box<dyn std::error::Error>> {
-        let input_vec = input.flat_vector(0);
-        let values = input_vec.as_slice_with_len::<duckdb_string_t>(input.len());
-        let mut output = output.flat_vector();
+        let vector = vectors.get_vector_at::<String>(0)?;
+        let reader = vector.reader()?;
+        let mut writer = output.writer()?;
 
-        for (i, value) in values.iter().enumerate() {
-            if input_vec.row_is_null(i as u64) {
-                output.set_null(i);
-                continue;
-            }
-            let mut value = *value;
-            let s = DuckString::new(&mut value).as_str().to_string();
-            let tokens = state.tokenizer.tokenize(&s);
-            let s2 = tokens
-                .iter()
-                .map(|t| t.0.as_str())
-                .collect::<Vec<&str>>()
-                .join(" ");
-            output.insert(i, s2.as_str());
+        for (i, row) in reader.iter().enumerate() {
+            match row {
+                Some(row) => {
+                    let tokens = self.tokenizer.tokenize(&row);
+                    let s2 = tokens
+                        .iter()
+                        .map(|t| t.0.as_str())
+                        .collect::<Vec<&str>>()
+                        .join(" ");
+                    writer.set(i, Some(&s2))
+                }
+                None => writer.set(i, None),
+            }?;
         }
         Ok(())
-    }
-
-    fn signatures() -> Vec<ScalarFunctionSignature> {
-        vec![ScalarFunctionSignature::exact(
-            vec![LogicalTypeId::Varchar.into()],
-            LogicalTypeId::Varchar.into(),
-        )]
     }
 }
 
 const EXTENSION_NAME: &str = env!("CARGO_PKG_NAME");
 
-#[duckdb_entrypoint_c_api]
-pub unsafe fn extension_entrypoint(con: Connection) -> Result<(), Box<dyn Error>> {
+#[duckdb_entrypoint_c_api_v2(extension_name = "wakati", api_version = "v2.0.0")]
+pub fn entrypoint(extension: &Extension) -> Result<()> {
     let tokenizer = if let Ok(mecabrc) = env::var("MECABRC") {
         tokenizer::Tokenizer::new(Some(&mecabrc))
     } else {
         tokenizer::Tokenizer::new(None)
     }
     .expect("Can't find dictionary");
-    con.register_scalar_function_with_state::<WakatiScalar>(
+
+    ScalarFunctionBuilder::new(
         EXTENSION_NAME,
-        &WakatiState { tokenizer },
+        SignatureBuilder::new()
+            .param(FunctionParameter::new::<String>("input"))
+            .return_type(String::logical_type(extension)?),
+        WakatiScalar { tokenizer },
     )
-    .expect("Failed to register wakati function");
+    .register(extension)?;
+
     Ok(())
 }

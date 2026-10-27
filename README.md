@@ -34,22 +34,20 @@ Installing these dependencies will vary per platform:
 ## Building
 After installing the dependencies, building is a two-step process. Firstly run:
 ```shell
-make configure DUCKDB_VERSION=1.4.5
+make configure DUCKDB_VERSION=2.0.0
 ```
 This will ensure a Python venv is set up with DuckDB and DuckDB's test runner installed. Additionally, depending on configuration,
 DuckDB will be used to determine the correct platform for which you are compiling.
 
 Then, to build the extension run:
 ```shell
-make debug DUCKDB_VERSION=1.4.5
+make debug DUCKDB_VERSION=2.0.0
 ```
 This delegates the build process to cargo, which will produce a shared library in `target/debug/<shared_lib_name>`. After this step,
 a script is run to transform the shared library into a loadable extension by appending a binary footer. The resulting extension is written
 to the `build/debug` directory.
 
-Replace `1.4.5` with the DuckDB version you are targeting (e.g. `1.5.4`).
-
-To create optimized release binaries, simply run `make release DUCKDB_VERSION=1.4.5` instead.
+To create optimized release binaries, simply run `make release DUCKDB_VERSION=2.0.0` instead.
 
 ### Requirements
 
@@ -107,10 +105,9 @@ To build and test with a specific DuckDB version, pass `DUCKDB_VERSION` to make:
 
 ```shell
 make clean_all
-make DUCKDB_VERSION=1.5.4
+make DUCKDB_VERSION=2.0.0
 ```
 
-This will automatically update `Cargo.toml` and set the correct DuckDB version for building and testing.
 The default version is defined in the `Makefile` (`DUCKDB_VERSION`).
 
 ### Known issues
