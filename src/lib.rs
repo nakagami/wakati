@@ -35,7 +35,7 @@ impl ScalarCallbacks for WakatiScalar {
         for (i, row) in reader.iter().enumerate() {
             match row {
                 Some(row) => {
-                    let tokens = self.tokenizer.tokenize(&row);
+                    let tokens = self.tokenizer.tokenize(row);
                     let s2 = tokens
                         .iter()
                         .map(|t| t.0.as_str())
