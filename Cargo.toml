@@ -2,6 +2,12 @@
 name = "wakati"
 version = "0.2.0"
 edition = "2024"
+authors = ["Hajime Nakagami <nakagami@gmail.com>"]
+description = "DuckDB extension that splits Japanese morphemes and connects them with spaces"
+license = "MIT"
+repository = "https://github.com/nakagami/wakati"
+readme = "README.md"
+keywords = ["duckdb", "mecab", "japanese"]
 
 [lib]
 crate-type = ["cdylib"]
